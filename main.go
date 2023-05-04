@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -17,6 +19,8 @@ import (
 const (
 	ScreenWidth  = 640
 	ScreenHeight = 480
+	SampleRate   = 48000
+	SoundsDir    = "assets/sounds"
 )
 
 var (
@@ -31,11 +35,25 @@ type Game struct {
 	target        string
 	score         int
 	dictionary    *dictionary.Dictionary
+	audioContext  *audio.Context
+	audioPlayer   *audio.Player
 }
 
 func CenterX(t string) int {
 	rect := text.BoundString(TextFont, t)
 	return (rect.Min.X + rect.Max.X) / 2
+}
+
+func (g *Game) Load() {
+	g.dictionary = dictionary.New()
+	g.audioContext = audio.NewContext(48000)
+
+	textSound := MustLoadSound("text_1_16.wav")
+	p, err := g.audioContext.NewPlayer(textSound)
+	if err != nil {
+		log.Panicf(err.Error())
+	}
+	g.audioPlayer = p
 }
 
 func (g *Game) Update() error {
@@ -48,14 +66,20 @@ func (g *Game) Update() error {
 	pressedKeys := inpututil.AppendJustPressedKeys(ps)
 	if IsLetterKey(pressedKeys) {
 		g.inputKeys = append(g.inputKeys, pressedKeys...)
+		g.audioPlayer.Rewind()
+		g.audioPlayer.Play()
 	}
 	if IsBackspaceKey(pressedKeys) {
 		if len(g.inputKeys) > 0 {
 			g.inputKeys = g.inputKeys[:len(g.inputKeys)-1]
+			g.audioPlayer.Rewind()
+			g.audioPlayer.Play()
 		}
 	}
 	if IsEnterKey(pressedKeys) {
 		g.inputKeys = []ebiten.Key{}
+		g.audioPlayer.Rewind()
+		g.audioPlayer.Play()
 		// if the current word matches then increase score
 		if g.message == g.target {
 			g.score += 1
@@ -96,13 +120,26 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return ScreenWidth, ScreenHeight
 }
 
+func MustLoadSound(n string) *wav.Stream {
+	tf := fmt.Sprintf("./%s/%s", SoundsDir, n)
+	f, err := os.Open(tf)
+	if err != nil {
+		log.Panicf("Could not open file %s", tf)
+	}
+	d, err := wav.DecodeWithoutResampling(f)
+	if err != nil {
+		log.Panicf("Could not decode file %s: %s", tf, err.Error())
+	}
+	return d
+}
+
 func main() {
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("typerace")
 
-	game := &Game{
-		dictionary: dictionary.New(),
-	}
+	game := &Game{}
+	game.Load()
+
 	err := ebiten.RunGame(game)
 	if err != nil {
 		log.Fatal(err)
