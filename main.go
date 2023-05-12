@@ -1,18 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"image/color"
 	"log"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/z0mi3ie/typerace/dictionary"
-	"github.com/z0mi3ie/typerace/sound"
-	"golang.org/x/image/font/basicfont"
+	"github.com/z0mi3ie/typerace/state"
 )
 
 const (
@@ -20,103 +12,17 @@ const (
 	ScreenHeight = 480
 )
 
-var (
-	TextFont = basicfont.Face7x13
-)
-
-type Game struct {
-	message       string
-	inputKeys     []ebiten.Key
-	inputCenterX  int
-	targetCenterX int
-	target        string
-	score         int
-	dictionary    *dictionary.Dictionary
-	soundManager  *sound.SoundManager
-}
-
-func CenterX(t string) int {
-	rect := text.BoundString(TextFont, t)
-	return (rect.Min.X + rect.Max.X) / 2
-}
-
-func (g *Game) Load() {
-	g.dictionary = dictionary.New()
-	g.soundManager = sound.New()
-	g.soundManager.Load()
-}
-
-func (g *Game) Update() error {
-	if g.target == "" {
-		g.target = g.dictionary.Random()
-	}
-
-	// Capture the keys and append them to the current keys list
-	var ps []ebiten.Key
-	pressedKeys := inpututil.AppendJustPressedKeys(ps)
-	if IsLetterKey(pressedKeys) {
-		g.inputKeys = append(g.inputKeys, pressedKeys...)
-		g.soundManager.Play("text-input")
-	}
-	if IsBackspaceKey(pressedKeys) {
-		if len(g.inputKeys) > 0 {
-			g.inputKeys = g.inputKeys[:len(g.inputKeys)-1]
-			g.soundManager.Play("text-delete")
-		}
-	}
-	if IsEnterKey(pressedKeys) {
-		g.inputKeys = []ebiten.Key{}
-		// if the current word matches then increase score
-		if g.message == g.target {
-			g.soundManager.Play("good")
-			g.score += 1
-			g.inputKeys = []ebiten.Key{}
-			g.message = ""
-			g.target = ""
-		} else {
-			g.soundManager.Play("error")
-		}
-	}
-
-	// Convert the current keys to a displayable string
-	var converted string
-	for _, k := range g.inputKeys {
-		converted = converted + k.String()
-	}
-	g.message = converted
-
-	// Update the center point of the string to render from
-	g.inputCenterX = CenterX(g.message)
-	g.targetCenterX = CenterX(g.target)
-
-	// Quit the game on ESC key release
-	if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
-		os.Exit(0)
-	}
-
-	return nil
-}
-
-func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"score: %d\ndictionary: %d", g.score, g.dictionary.Length(),
-	))
-	text.Draw(screen, g.target, TextFont, (ScreenWidth/2)-g.targetCenterX, ScreenHeight/2-20, color.White)
-	text.Draw(screen, g.message, TextFont, (ScreenWidth/2)-g.inputCenterX, ScreenHeight/2, color.White)
-}
-
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return ScreenWidth, ScreenHeight
-}
-
 func main() {
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("typerace")
 
-	game := &Game{}
-	game.Load()
+	raceState := &state.RaceState{}
+	raceState.Load()
 
-	err := ebiten.RunGame(game)
+	stateManager := state.NewStateManager()
+	stateManager.Push(raceState)
+
+	err := ebiten.RunGame(stateManager)
 	if err != nil {
 		log.Fatal(err)
 	}
