@@ -34,7 +34,8 @@ type RaceState struct {
 // Load assets from disk and initialize them if needed
 func (s *RaceState) Load() {
 	s.dictionary = dictionary.New()
-	s.soundManager = sound.GetSoundManager()()
+	s.soundManager = sound.GetSoundManager()
+	s.soundManager.Load()
 }
 
 func (s *RaceState) Update() error {

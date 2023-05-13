@@ -18,13 +18,8 @@ func main() {
 
 	stateManager := state.GetStateManager()
 
-	//raceState := &state.RaceState{}
-	//raceState.Load()
-	//stateManager.Push(raceState)
-
 	titleState := &state.TitleState{}
 	titleState.Load()
-	titleState.Enable()
 	stateManager.Push(titleState)
 
 	err := ebiten.RunGame(stateManager)

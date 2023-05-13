@@ -19,21 +19,20 @@ type SoundManager struct {
 	SFXLibrary   map[string]*audio.Player
 }
 
+var soundMgr *SoundManager
+
 func New() *SoundManager {
 	mgr := &SoundManager{}
 	mgr.SFXLibrary = make(map[string]*audio.Player)
 	return mgr
 }
 
-func GetSoundManager() func() *SoundManager {
-	var sm *SoundManager
-	return func() *SoundManager {
-		if sm == nil {
-			sm = New()
-			return sm
-		}
-		return sm
+func GetSoundManager() *SoundManager {
+	if soundMgr != nil {
+		return soundMgr
 	}
+
+	return New()
 }
 
 func (s *SoundManager) Load() {
