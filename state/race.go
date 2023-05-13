@@ -28,13 +28,13 @@ type RaceState struct {
 	score         int
 	dictionary    *dictionary.Dictionary
 	soundManager  *sound.SoundManager
+	enabled       bool
 }
 
 // Load assets from disk and initialize them if needed
 func (s *RaceState) Load() {
 	s.dictionary = dictionary.New()
-	s.soundManager = sound.New()
-	s.soundManager.Load()
+	s.soundManager = sound.GetSoundManager()()
 }
 
 func (s *RaceState) Update() error {
@@ -99,6 +99,18 @@ func (s *RaceState) Draw(screen *ebiten.Image) {
 
 func (s *RaceState) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return ScreenWidth, ScreenHeight
+}
+
+func (s *RaceState) Disable() {
+	s.enabled = false
+}
+
+func (s *RaceState) Enable() {
+	s.enabled = true
+}
+
+func (s *RaceState) Enabled() bool {
+	return s.enabled
 }
 
 func CenterX(t string) int {

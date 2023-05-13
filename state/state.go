@@ -12,4 +12,7 @@ const (
 type State interface {
 	Update() error
 	Draw(screen *ebiten.Image)
+	Disable()
+	Enable()
+	Enabled() bool
 }

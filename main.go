@@ -16,11 +16,16 @@ func main() {
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("typerace")
 
-	raceState := &state.RaceState{}
-	raceState.Load()
+	stateManager := state.GetStateManager()
 
-	stateManager := state.NewStateManager()
-	stateManager.Push(raceState)
+	//raceState := &state.RaceState{}
+	//raceState.Load()
+	//stateManager.Push(raceState)
+
+	titleState := &state.TitleState{}
+	titleState.Load()
+	titleState.Enable()
+	stateManager.Push(titleState)
 
 	err := ebiten.RunGame(stateManager)
 	if err != nil {
