@@ -2,6 +2,7 @@ package state
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -32,6 +33,11 @@ func (s *TitleState) Update() error {
 		raceState.Enable()
 		stateManager := GetStateManager()
 		stateManager.Push(&raceState)
+	}
+
+	// Quit the game on ESC key release
+	if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
+		os.Exit(0)
 	}
 
 	return nil

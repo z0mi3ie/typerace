@@ -42,3 +42,11 @@ func (sm *StateManager) Push(g State) {
 	sm.states = append(sm.states, g)
 	sm.ii++
 }
+
+func (sm *StateManager) Pop() {
+	if sm.ii < 1 {
+		return
+	}
+	sm.states = sm.states[:len(sm.states)-1]
+	sm.ii--
+}

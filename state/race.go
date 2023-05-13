@@ -3,7 +3,6 @@ package state
 import (
 	"fmt"
 	"image/color"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -12,6 +11,7 @@ import (
 	"github.com/z0mi3ie/typerace/dictionary"
 	"github.com/z0mi3ie/typerace/input"
 	"github.com/z0mi3ie/typerace/sound"
+	"github.com/z0mi3ie/typerace/util"
 	"golang.org/x/image/font/basicfont"
 )
 
@@ -78,16 +78,18 @@ func (s *RaceState) Update() error {
 	s.message = converted
 
 	// Update the center point of the string to render from
-	s.inputCenterX = CenterX(s.message)
-	s.targetCenterX = CenterX(s.target)
+	s.inputCenterX = util.CenterX(s.message)
+	s.targetCenterX = util.CenterX(s.target)
 
 	// Quit the game on ESC key release
 	if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
-		os.Exit(0)
+		//os.Exit(0)
+		stateManager := GetStateManager()
+		stateManager.Pop()
+		return nil
 	}
 
 	return nil
-
 }
 
 func (s *RaceState) Draw(screen *ebiten.Image) {
@@ -112,9 +114,4 @@ func (s *RaceState) Enable() {
 
 func (s *RaceState) Enabled() bool {
 	return s.enabled
-}
-
-func CenterX(t string) int {
-	rect := text.BoundString(TextFont, t)
-	return (rect.Min.X + rect.Max.X) / 2
 }

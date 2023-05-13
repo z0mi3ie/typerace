@@ -36,11 +36,11 @@ func GetSoundManager() *SoundManager {
 }
 
 func (s *SoundManager) Load() {
+	s.AudioContext = audio.CurrentContext()
+
 	if s.AudioContext == nil {
 		s.AudioContext = audio.NewContext(SampleRate)
 	}
-
-	s.AudioContext = audio.CurrentContext()
 
 	textSound := MustLoadSound("text_1_16.wav")
 	p, err := s.AudioContext.NewPlayer(textSound)
