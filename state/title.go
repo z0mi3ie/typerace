@@ -1,7 +1,6 @@
 package state
 
 import (
-	"fmt"
 	"image/color"
 	"os"
 
@@ -13,6 +12,10 @@ import (
 	"github.com/z0mi3ie/typerace/sound"
 	"github.com/z0mi3ie/typerace/util"
 )
+
+const title = "typeracer"
+const author = ""
+const continueText = "pres enter key..."
 
 type TitleState struct {
 	title        string
@@ -28,9 +31,7 @@ func (s *TitleState) Load() {
 func (s *TitleState) Update() error {
 	var ps []ebiten.Key
 	pressedKeys := inpututil.AppendJustPressedKeys(ps)
-	fmt.Println("title-state")
 	if input.IsEnterKey(pressedKeys) {
-		fmt.Println("enter pressed")
 		raceState := RaceState{}
 		raceState.Load()
 		raceState.Enable()
@@ -50,16 +51,23 @@ func (s *TitleState) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "title state")
 
 	text.Draw(screen,
-		"typracer", TextFont,
-		(ScreenWidth/2)-util.CenterX("typeracer"),
-		ScreenHeight/2-20,
+		title, TextFont,
+		(ScreenWidth/2)-util.CenterX(title),
+		ScreenHeight/2-40,
 		color.White,
 	)
 
 	text.Draw(screen,
-		"press enter key...", TextFont,
-		(ScreenWidth/2)-util.CenterX("press enter key..."),
-		ScreenHeight/2+20,
+		author, TextFont,
+		(ScreenWidth/2)-util.CenterX(author),
+		ScreenHeight/2+10,
+		color.White,
+	)
+
+	text.Draw(screen,
+		continueText, TextFont,
+		(ScreenWidth/2)-util.CenterX(continueText),
+		ScreenHeight/2+80,
 		color.White,
 	)
 }
