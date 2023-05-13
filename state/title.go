@@ -2,13 +2,16 @@ package state
 
 import (
 	"fmt"
+	"image/color"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/z0mi3ie/typerace/input"
 	"github.com/z0mi3ie/typerace/sound"
+	"github.com/z0mi3ie/typerace/util"
 )
 
 type TitleState struct {
@@ -45,6 +48,20 @@ func (s *TitleState) Update() error {
 
 func (s *TitleState) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "title state")
+
+	text.Draw(screen,
+		"typracer", TextFont,
+		(ScreenWidth/2)-util.CenterX("typeracer"),
+		ScreenHeight/2-20,
+		color.White,
+	)
+
+	text.Draw(screen,
+		"press enter key...", TextFont,
+		(ScreenWidth/2)-util.CenterX("press enter key..."),
+		ScreenHeight/2+20,
+		color.White,
+	)
 }
 
 func (s *TitleState) Disable() {
