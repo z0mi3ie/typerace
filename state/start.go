@@ -53,14 +53,23 @@ func (s *StartState) Update() error {
 }
 
 func (s *StartState) Draw(screen *ebiten.Image) {
-	// Sense we are using a pointer to save the integer
+	// We are using a pointer to save the integer
 	// being operated on by a ticker, make sure its been
 	// initialized before the engine tries to render
 	if s.count != nil {
+		readyText := "Get ready"
+		timeRemaining := fmt.Sprintf("%d", s.count.Int)
 		text.Draw(screen,
-			fmt.Sprintf("Get ready... %d", s.count.Int), TextFont,
-			(ScreenWidth/2)-util.CenterX(title),
-			ScreenHeight/2-40,
+			readyText, TextFont,
+			(ScreenWidth/2)-util.CenterX(readyText),
+			ScreenHeight/2-20,
+			color.RGBA{R: 255, G: 0, B: 0, A: 255},
+		)
+
+		text.Draw(screen,
+			timeRemaining, TextFont,
+			(ScreenWidth/2)-util.CenterX(timeRemaining),
+			ScreenHeight/2,
 			color.RGBA{R: 255, G: 0, B: 0, A: 255},
 		)
 	}

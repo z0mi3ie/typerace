@@ -128,18 +128,32 @@ func (s *RaceState) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"score: %d\ndictionary: %d", s.score, s.dictionary.Length(),
 	))
+
+	// Current word from dictionary
 	text.Draw(screen,
 		s.target, TextFont,
 		(ScreenWidth/2)-s.targetCenterX,
 		ScreenHeight/2-20,
 		color.White,
 	)
+
+	// Current message typed by user
 	text.Draw(screen,
 		s.message, TextFont,
 		(ScreenWidth/2)-s.inputCenterX,
 		ScreenHeight/2,
 		color.White,
 	)
+
+	// Time remaining
+	if s.count != nil {
+		text.Draw(screen,
+			fmt.Sprintf("Time remaining: %d", s.count.Int), TextFont,
+			(ScreenWidth/2)-util.CenterX(continueText),
+			30,
+			color.White,
+		)
+	}
 }
 
 func (s *RaceState) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

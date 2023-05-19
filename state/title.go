@@ -14,8 +14,8 @@ import (
 )
 
 const title = "typeracer"
-const author = ""
-const continueText = "pres enter key..."
+const author = "| kyle vickers |"
+const continueText = "press enter key..."
 
 type TitleState struct {
 	title        string
