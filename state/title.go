@@ -32,11 +32,16 @@ func (s *TitleState) Update() error {
 	var ps []ebiten.Key
 	pressedKeys := inpututil.AppendJustPressedKeys(ps)
 	if input.IsEnterKey(pressedKeys) {
-		raceState := RaceState{}
-		raceState.Load()
-		raceState.Enable()
+		// Create next state, load the assets and enable it
+		//raceState := RaceState{}
+		//raceState.Load()
+		//raceState.Enable()
+		//stateManager := GetStateManager()
+		//stateManager.Push(&raceState)
+		startState := StartState{}
+		startState.Enable()
 		stateManager := GetStateManager()
-		stateManager.Push(&raceState)
+		stateManager.Push(&startState)
 	}
 
 	// Quit the game on ESC key release

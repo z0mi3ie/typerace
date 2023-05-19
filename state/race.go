@@ -81,10 +81,12 @@ func (s *RaceState) Update() error {
 	s.inputCenterX = util.CenterX(s.message)
 	s.targetCenterX = util.CenterX(s.target)
 
-	// Quit the game on ESC key release
+	// Go back to the title screen on escape press
 	if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
-		//os.Exit(0)
 		stateManager := GetStateManager()
+		stateManager.Pop()
+		// TODO: implement some state enums, might be better to have a combination here
+		// Pop off the extra start state
 		stateManager.Pop()
 		return nil
 	}

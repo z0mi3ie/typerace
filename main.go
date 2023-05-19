@@ -12,7 +12,7 @@ const (
 	ScreenHeight = 480
 )
 
-func main() {
+func startGame() {
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("typerace")
 
@@ -26,4 +26,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func scratch() {
+}
+
+func main() {
+	//scratch()
+	startGame()
 }
