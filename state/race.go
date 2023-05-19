@@ -5,10 +5,10 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/z0mi3ie/typerace/dictionary"
+	"github.com/z0mi3ie/typerace/game"
 	"github.com/z0mi3ie/typerace/input"
 	"github.com/z0mi3ie/typerace/sound"
 	"github.com/z0mi3ie/typerace/util"
@@ -20,15 +20,34 @@ var (
 )
 
 type RaceState struct {
+	isSetup       bool
 	message       string
 	inputKeys     []ebiten.Key
 	inputCenterX  int
 	targetCenterX int
 	target        string
+	total         int
 	score         int
 	dictionary    *dictionary.Dictionary
 	soundManager  *sound.SoundManager
 	enabled       bool
+	done          chan bool
+	count         *util.Integer
+	round         *game.Round
+}
+
+func (s *RaceState) setup() {
+	fmt.Println("> race state setup")
+	s.count = &util.Integer{
+		Int: 10,
+	}
+	s.done = util.CountDown(s.count, func(n int) {
+		fmt.Println("time remaining: ", n)
+	})
+
+	s.round = game.GetRound()
+	s.round.Reset()
+	s.isSetup = true
 }
 
 // Load assets from disk and initialize them if needed
@@ -39,6 +58,10 @@ func (s *RaceState) Load() {
 }
 
 func (s *RaceState) Update() error {
+	if !s.isSetup {
+		s.setup()
+	}
+
 	if s.target == "" {
 		s.target = s.dictionary.Random()
 	}
@@ -61,12 +84,13 @@ func (s *RaceState) Update() error {
 		// if the current word matches then increase score
 		if s.message == s.target {
 			s.soundManager.Play("good")
-			s.score += 1
+			s.total, s.score = s.round.Correct(s.message)
 			s.inputKeys = []ebiten.Key{}
 			s.message = ""
 			s.target = ""
 		} else {
 			s.soundManager.Play("error")
+			s.round.Wrong()
 		}
 	}
 
@@ -91,15 +115,54 @@ func (s *RaceState) Update() error {
 		return nil
 	}
 
-	return nil
+	select {
+	case _ = <-s.done:
+		scoreState := &ScoreState{
+			round: s.round,
+		}
+		stateMgr := GetStateManager()
+		stateMgr.Push(scoreState)
+		return nil
+	default:
+		return nil
+	}
 }
 
 func (s *RaceState) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"score: %d\ndictionary: %d", s.score, s.dictionary.Length(),
-	))
-	text.Draw(screen, s.target, TextFont, (ScreenWidth/2)-s.targetCenterX, ScreenHeight/2-20, color.White)
-	text.Draw(screen, s.message, TextFont, (ScreenWidth/2)-s.inputCenterX, ScreenHeight/2, color.White)
+	score := fmt.Sprintf("Score: %d", s.score)
+	text.Draw(screen,
+		score, TextFont,
+		(ScreenWidth/2)-util.CenterX(score),
+		ScreenHeight/2+80,
+		color.White,
+	)
+
+	// Current word from dictionary
+	text.Draw(screen,
+		s.target, TextFont,
+		(ScreenWidth/2)-s.targetCenterX,
+		ScreenHeight/2-20,
+		color.White,
+	)
+
+	// Current message typed by user
+	text.Draw(screen,
+		s.message, TextFont,
+		(ScreenWidth/2)-s.inputCenterX,
+		ScreenHeight/2,
+		color.White,
+	)
+
+	// Time remaining
+	if s.count != nil {
+		timeRemaining := fmt.Sprintf("< %d >", s.count.Int)
+		text.Draw(screen,
+			timeRemaining, TextFont,
+			(ScreenWidth/2)-util.CenterX(timeRemaining),
+			30,
+			color.White,
+		)
+	}
 }
 
 func (s *RaceState) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

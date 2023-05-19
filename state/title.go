@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/z0mi3ie/typerace/input"
@@ -14,8 +13,8 @@ import (
 )
 
 const title = "typeracer"
-const author = ""
-const continueText = "pres enter key..."
+const author = "github.com/z0mi3ie"
+const continueText = "press enter key..."
 
 type TitleState struct {
 	title        string
@@ -32,12 +31,6 @@ func (s *TitleState) Update() error {
 	var ps []ebiten.Key
 	pressedKeys := inpututil.AppendJustPressedKeys(ps)
 	if input.IsEnterKey(pressedKeys) {
-		// Create next state, load the assets and enable it
-		//raceState := RaceState{}
-		//raceState.Load()
-		//raceState.Enable()
-		//stateManager := GetStateManager()
-		//stateManager.Push(&raceState)
 		startState := StartState{}
 		startState.Enable()
 		stateManager := GetStateManager()
@@ -53,13 +46,11 @@ func (s *TitleState) Update() error {
 }
 
 func (s *TitleState) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "title state")
-
 	text.Draw(screen,
 		title, TextFont,
 		(ScreenWidth/2)-util.CenterX(title),
-		ScreenHeight/2-40,
-		color.White,
+		ScreenHeight/2-60,
+		color.RGBA{R: 255, G: 50, B: 125, A: 255},
 	)
 
 	text.Draw(screen,
@@ -73,7 +64,7 @@ func (s *TitleState) Draw(screen *ebiten.Image) {
 		continueText, TextFont,
 		(ScreenWidth/2)-util.CenterX(continueText),
 		ScreenHeight/2+80,
-		color.White,
+		color.RGBA{R: 0, G: 255, B: 0, A: 255},
 	)
 }
 
