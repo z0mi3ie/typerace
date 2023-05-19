@@ -19,14 +19,28 @@ type SoundManager struct {
 	SFXLibrary   map[string]*audio.Player
 }
 
+var soundMgr *SoundManager
+
 func New() *SoundManager {
 	mgr := &SoundManager{}
 	mgr.SFXLibrary = make(map[string]*audio.Player)
 	return mgr
 }
 
+func GetSoundManager() *SoundManager {
+	if soundMgr != nil {
+		return soundMgr
+	}
+
+	return New()
+}
+
 func (s *SoundManager) Load() {
-	s.AudioContext = audio.NewContext(SampleRate)
+	s.AudioContext = audio.CurrentContext()
+
+	if s.AudioContext == nil {
+		s.AudioContext = audio.NewContext(SampleRate)
+	}
 
 	textSound := MustLoadSound("text_1_16.wav")
 	p, err := s.AudioContext.NewPlayer(textSound)
