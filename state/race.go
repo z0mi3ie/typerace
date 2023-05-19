@@ -20,6 +20,7 @@ var (
 )
 
 type RaceState struct {
+	isSetup       bool
 	message       string
 	inputKeys     []ebiten.Key
 	inputCenterX  int
@@ -29,6 +30,19 @@ type RaceState struct {
 	dictionary    *dictionary.Dictionary
 	soundManager  *sound.SoundManager
 	enabled       bool
+	done          chan bool
+	count         *util.Integer
+}
+
+func (s *RaceState) setup() {
+	fmt.Println("> race state setup")
+	s.count = &util.Integer{
+		Int: 10,
+	}
+	s.done = util.CountDown(s.count, func(n int) {
+		fmt.Println("time remaining: ", n)
+	})
+	s.isSetup = true
 }
 
 // Load assets from disk and initialize them if needed
@@ -39,6 +53,10 @@ func (s *RaceState) Load() {
 }
 
 func (s *RaceState) Update() error {
+	if !s.isSetup {
+		s.setup()
+	}
+
 	if s.target == "" {
 		s.target = s.dictionary.Random()
 	}
@@ -91,15 +109,37 @@ func (s *RaceState) Update() error {
 		return nil
 	}
 
-	return nil
+	select {
+	case _ = <-s.done:
+		// TODO: round has ended and end round state should be present here
+		// TODO: go back to title for now
+		stateManager := GetStateManager()
+		stateManager.Pop()
+		// TODO: implement some state enums, might be better to have a combination here
+		// Pop off the extra start state
+		stateManager.Pop()
+		return nil
+	default:
+		return nil
+	}
 }
 
 func (s *RaceState) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"score: %d\ndictionary: %d", s.score, s.dictionary.Length(),
 	))
-	text.Draw(screen, s.target, TextFont, (ScreenWidth/2)-s.targetCenterX, ScreenHeight/2-20, color.White)
-	text.Draw(screen, s.message, TextFont, (ScreenWidth/2)-s.inputCenterX, ScreenHeight/2, color.White)
+	text.Draw(screen,
+		s.target, TextFont,
+		(ScreenWidth/2)-s.targetCenterX,
+		ScreenHeight/2-20,
+		color.White,
+	)
+	text.Draw(screen,
+		s.message, TextFont,
+		(ScreenWidth/2)-s.inputCenterX,
+		ScreenHeight/2,
+		color.White,
+	)
 }
 
 func (s *RaceState) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

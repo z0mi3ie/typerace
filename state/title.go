@@ -32,12 +32,6 @@ func (s *TitleState) Update() error {
 	var ps []ebiten.Key
 	pressedKeys := inpututil.AppendJustPressedKeys(ps)
 	if input.IsEnterKey(pressedKeys) {
-		// Create next state, load the assets and enable it
-		//raceState := RaceState{}
-		//raceState.Load()
-		//raceState.Enable()
-		//stateManager := GetStateManager()
-		//stateManager.Push(&raceState)
 		startState := StartState{}
 		startState.Enable()
 		stateManager := GetStateManager()

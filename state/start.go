@@ -10,10 +10,10 @@ import (
 )
 
 type StartState struct {
-	isSetup      bool
-	count        *util.Integer
-	enabled      bool
-	doneCounting chan bool
+	isSetup bool
+	count   *util.Integer
+	enabled bool
+	done    chan bool
 }
 
 func (s *StartState) setup() {
@@ -21,7 +21,7 @@ func (s *StartState) setup() {
 	s.count = &util.Integer{
 		Int: 5,
 	}
-	s.doneCounting = util.CountDown(s.count, func(n int) {
+	s.done = util.CountDown(s.count, func(n int) {
 		fmt.Println("time remaining: ", n)
 	})
 	s.isSetup = true
@@ -39,7 +39,7 @@ func (s *StartState) Update() error {
 	}
 
 	select {
-	case _ = <-s.doneCounting:
+	case _ = <-s.done:
 		raceState := RaceState{}
 		raceState.Load()
 		raceState.Enable()
@@ -61,7 +61,7 @@ func (s *StartState) Draw(screen *ebiten.Image) {
 			fmt.Sprintf("Get ready... %d", s.count.Int), TextFont,
 			(ScreenWidth/2)-util.CenterX(title),
 			ScreenHeight/2-40,
-			color.White,
+			color.RGBA{R: 255, G: 0, B: 0, A: 255},
 		)
 	}
 }
