@@ -57,7 +57,7 @@ func (s *StartState) Draw(screen *ebiten.Image) {
 	// being operated on by a ticker, make sure its been
 	// initialized before the engine tries to render
 	if s.count != nil {
-		readyText := "Get ready"
+		readyText := "Get READY!"
 		timeRemaining := fmt.Sprintf("%d", s.count.Int)
 		text.Draw(screen,
 			readyText, TextFont,

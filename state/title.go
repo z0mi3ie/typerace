@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/z0mi3ie/typerace/input"
@@ -14,7 +13,7 @@ import (
 )
 
 const title = "typeracer"
-const author = "| kyle vickers |"
+const author = "github.com/z0mi3ie"
 const continueText = "press enter key..."
 
 type TitleState struct {
@@ -47,8 +46,6 @@ func (s *TitleState) Update() error {
 }
 
 func (s *TitleState) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "title state")
-
 	text.Draw(screen,
 		title, TextFont,
 		(ScreenWidth/2)-util.CenterX(title),

@@ -5,10 +5,10 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/z0mi3ie/typerace/dictionary"
+	"github.com/z0mi3ie/typerace/game"
 	"github.com/z0mi3ie/typerace/input"
 	"github.com/z0mi3ie/typerace/sound"
 	"github.com/z0mi3ie/typerace/util"
@@ -26,12 +26,14 @@ type RaceState struct {
 	inputCenterX  int
 	targetCenterX int
 	target        string
+	total         int
 	score         int
 	dictionary    *dictionary.Dictionary
 	soundManager  *sound.SoundManager
 	enabled       bool
 	done          chan bool
 	count         *util.Integer
+	round         *game.Round
 }
 
 func (s *RaceState) setup() {
@@ -42,6 +44,9 @@ func (s *RaceState) setup() {
 	s.done = util.CountDown(s.count, func(n int) {
 		fmt.Println("time remaining: ", n)
 	})
+
+	s.round = game.GetRound()
+	s.round.Reset()
 	s.isSetup = true
 }
 
@@ -79,7 +84,7 @@ func (s *RaceState) Update() error {
 		// if the current word matches then increase score
 		if s.message == s.target {
 			s.soundManager.Play("good")
-			s.score += 1
+			s.total, s.score = s.round.Correct(s.message)
 			s.inputKeys = []ebiten.Key{}
 			s.message = ""
 			s.target = ""
@@ -125,9 +130,13 @@ func (s *RaceState) Update() error {
 }
 
 func (s *RaceState) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"score: %d\ndictionary: %d", s.score, s.dictionary.Length(),
-	))
+	score := fmt.Sprintf("Score: %d", s.score)
+	text.Draw(screen,
+		score, TextFont,
+		(ScreenWidth/2)-util.CenterX(score),
+		ScreenHeight/2+80,
+		color.White,
+	)
 
 	// Current word from dictionary
 	text.Draw(screen,
@@ -147,9 +156,10 @@ func (s *RaceState) Draw(screen *ebiten.Image) {
 
 	// Time remaining
 	if s.count != nil {
+		timeRemaining := fmt.Sprintf("< %d >", s.count.Int)
 		text.Draw(screen,
-			fmt.Sprintf("Time remaining: %d", s.count.Int), TextFont,
-			(ScreenWidth/2)-util.CenterX(continueText),
+			timeRemaining, TextFont,
+			(ScreenWidth/2)-util.CenterX(timeRemaining),
 			30,
 			color.White,
 		)
