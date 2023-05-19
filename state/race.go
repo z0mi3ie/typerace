@@ -90,6 +90,7 @@ func (s *RaceState) Update() error {
 			s.target = ""
 		} else {
 			s.soundManager.Play("error")
+			s.round.Wrong()
 		}
 	}
 
@@ -116,13 +117,11 @@ func (s *RaceState) Update() error {
 
 	select {
 	case _ = <-s.done:
-		// TODO: round has ended and end round state should be present here
-		// TODO: go back to title for now
-		stateManager := GetStateManager()
-		stateManager.Pop()
-		// TODO: implement some state enums, might be better to have a combination here
-		// Pop off the extra start state
-		stateManager.Pop()
+		scoreState := &ScoreState{
+			round: s.round,
+		}
+		stateMgr := GetStateManager()
+		stateMgr.Push(scoreState)
 		return nil
 	default:
 		return nil

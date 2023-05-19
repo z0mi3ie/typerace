@@ -1,14 +1,18 @@
 package game
 
+import (
+	"fmt"
+)
+
 var round *Round
 
 type Round struct {
 	// Total words completed
-	total int
+	Total int
 	// Total incorrect words
-	incorrect int
+	Incorrect int
 	// Score with per character points
-	score int
+	Score int
 }
 
 func GetRound() *Round {
@@ -16,23 +20,24 @@ func GetRound() *Round {
 		return round
 	}
 
+	fmt.Println("setting up new round")
 	round = &Round{}
 	return round
 }
 
 func (r *Round) Correct(w string) (int, int) {
-	r.total++
-	r.score += len(w)
-	return r.total, r.score
+	r.Total++
+	r.Score += len(w)
+	return r.Total, r.Score
 }
 
-func (r *Round) Incorrect() int {
-	r.incorrect++
-	return r.incorrect
+func (r *Round) Wrong() int {
+	r.Incorrect++
+	return r.Incorrect
 }
 
 func (r *Round) FinalScore() int {
-	return r.score
+	return r.Score
 }
 
 func (r *Round) Reset() *Round {

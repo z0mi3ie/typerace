@@ -49,8 +49,8 @@ func (s *TitleState) Draw(screen *ebiten.Image) {
 	text.Draw(screen,
 		title, TextFont,
 		(ScreenWidth/2)-util.CenterX(title),
-		ScreenHeight/2-40,
-		color.White,
+		ScreenHeight/2-60,
+		color.RGBA{R: 255, G: 50, B: 125, A: 255},
 	)
 
 	text.Draw(screen,
@@ -64,7 +64,7 @@ func (s *TitleState) Draw(screen *ebiten.Image) {
 		continueText, TextFont,
 		(ScreenWidth/2)-util.CenterX(continueText),
 		ScreenHeight/2+80,
-		color.White,
+		color.RGBA{R: 0, G: 255, B: 0, A: 255},
 	)
 }
 
