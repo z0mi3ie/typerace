@@ -43,14 +43,4 @@ func CountDown(n *Integer, f TickAction) chan bool {
 
 	fmt.Println("returning channel")
 	return done
-
-	/*
-		for {
-			if cd == 0 {
-				ticker.Stop()
-				done <- true
-				break
-			}
-		}
-	*/
 }

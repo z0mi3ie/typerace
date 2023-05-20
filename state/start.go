@@ -2,11 +2,13 @@ package state
 
 import (
 	"fmt"
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/z0mi3ie/typerace/sound"
 	"github.com/z0mi3ie/typerace/util"
-	"image/color"
 )
 
 type StartState struct {
@@ -18,11 +20,18 @@ type StartState struct {
 
 func (s *StartState) setup() {
 	fmt.Println("> start state setup")
+	sndMgr := sound.GetSoundManager()
+	sndMgr.Load()
+
 	s.count = &util.Integer{
 		Int: 5,
 	}
 	s.done = util.CountDown(s.count, func(n int) {
 		fmt.Println("time remaining: ", n)
+		if n < 4 {
+			sndMgr.Play("good")
+		}
+
 	})
 	s.isSetup = true
 }
