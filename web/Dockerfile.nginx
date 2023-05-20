@@ -1,0 +1,6 @@
+FROM nginx:latest
+
+COPY static /usr/share/nginx/html
+COPY bin/typerace.wasm /usr/share/nginx/html
+COPY bin/wasm_exec.js /usr/share/nginx/html
+
