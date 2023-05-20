@@ -2,7 +2,6 @@ package state
 
 import (
 	"image/color"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -38,9 +37,9 @@ func (s *TitleState) Update() error {
 	}
 
 	// Quit the game on ESC key release
-	if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
-		os.Exit(0)
-	}
+	//if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
+	//	os.Exit(0)
+	//}
 
 	return nil
 }

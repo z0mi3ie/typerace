@@ -2,9 +2,9 @@ package dictionary
 
 import (
 	"bufio"
+	"embed"
 	"log"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 )
@@ -14,6 +14,9 @@ type Dictionary struct {
 	words   []string
 	rng     *rand.Rand
 }
+
+//go:embed assets
+var fs embed.FS
 
 func New() *Dictionary {
 	d := &Dictionary{}
@@ -25,7 +28,7 @@ func New() *Dictionary {
 }
 
 func (d *Dictionary) Load() {
-	f, err := os.Open("words.txt")
+	f, err := fs.Open("assets/words.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

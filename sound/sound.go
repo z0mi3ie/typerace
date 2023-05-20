@@ -1,9 +1,9 @@
 package sound
 
 import (
+	"embed"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
@@ -14,12 +14,15 @@ const (
 	SoundsDir  = "assets/sounds"
 )
 
+var soundMgr *SoundManager
+
+//go:embed assets
+var fs embed.FS
+
 type SoundManager struct {
 	AudioContext *audio.Context
 	SFXLibrary   map[string]*audio.Player
 }
-
-var soundMgr *SoundManager
 
 func New() *SoundManager {
 	mgr := &SoundManager{}
@@ -42,19 +45,12 @@ func (s *SoundManager) Load() {
 		s.AudioContext = audio.NewContext(SampleRate)
 	}
 
-	textSound := MustLoadSound("text_1_16.wav")
-	p, err := s.AudioContext.NewPlayer(textSound)
-	if err != nil {
-		log.Panicf(err.Error())
-	}
-	s.SFXLibrary["text-input"] = p
 	s.AddSound("text-input", "text_1_16.wav")
 	s.AddSound("text-delete", "cancel_1_16.wav")
 	s.AddSound("error", "boss_hit_1_16.wav")
 	s.AddSound("good", "confirm_1_16.wav")
 }
 
-// Loads the audio file from disc and adds to the sound library under key
 func (s *SoundManager) AddSound(key, fn string) {
 	snd := MustLoadSound(fn)
 	p, err := s.AudioContext.NewPlayer(snd)
@@ -70,8 +66,8 @@ func (s *SoundManager) Play(name string) {
 }
 
 func MustLoadSound(n string) *wav.Stream {
-	tf := fmt.Sprintf("./%s/%s", SoundsDir, n)
-	f, err := os.Open(tf)
+	tf := fmt.Sprintf("%s/%s", SoundsDir, n)
+	f, err := fs.Open(tf)
 	if err != nil {
 		log.Panicf("Could not open file %s", tf)
 	}
