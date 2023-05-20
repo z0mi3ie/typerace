@@ -43,6 +43,9 @@ func (s *RaceState) setup() {
 	}
 	s.done = util.CountDown(s.count, func(n int) {
 		fmt.Println("time remaining: ", n)
+		if n < 4 {
+			s.soundManager.Play("good")
+		}
 	})
 
 	s.round = game.GetRound()
